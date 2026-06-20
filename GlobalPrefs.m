@@ -609,6 +609,12 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2) {
 }
 
 - (NSColor*)foregroundTextColor {
+	if (@available(macOS 10.14, *)) {
+		NSAppearanceName name = [[NSApp effectiveAppearance] bestMatchFromAppearancesWithNames:
+			@[NSAppearanceNameAqua, NSAppearanceNameDarkAqua]];
+		if ([name isEqualToString:NSAppearanceNameDarkAqua])
+			return [NSColor colorWithCalibratedWhite:0.85 alpha:1.0];
+	}
 	NSData *theData = [defaults dataForKey:ForegroundTextColorKey];
 	if (theData) return (NSColor *)[NSUnarchiver unarchiveObjectWithData:theData];
 	return nil;
@@ -630,12 +636,15 @@ BOOL ColorsEqualWith8BitChannels(NSColor *c1, NSColor *c2) {
 }
 
 - (NSColor*)backgroundTextColor {
-	//don't need to cache the unarchived color, as it's not used in a random-access pattern
-	
+	if (@available(macOS 10.14, *)) {
+		NSAppearanceName name = [[NSApp effectiveAppearance] bestMatchFromAppearancesWithNames:
+			@[NSAppearanceNameAqua, NSAppearanceNameDarkAqua]];
+		if ([name isEqualToString:NSAppearanceNameDarkAqua])
+			return [NSColor colorWithCalibratedWhite:0.12 alpha:1.0];
+	}
 	NSData *theData = [defaults dataForKey:BackgroundTextColorKey];
 	if (theData) return (NSColor *)[NSUnarchiver unarchiveObjectWithData:theData];
-
-	return nil;	
+	return nil;
 }
 
 - (BOOL)tableColumnsShowPreview {

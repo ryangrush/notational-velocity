@@ -61,8 +61,10 @@
 		NSAppleEventManager *appleEventManager = [NSAppleEventManager sharedAppleEventManager];
 		[appleEventManager setEventHandler:self andSelector:@selector(handleGetURLEvent:withReplyEvent:) forEventClass:kInternetEventClass andEventID:kAEGetURL];	
 		
-		dividerShader = [[LinearDividerShader alloc] initWithStartColor:[NSColor colorWithCalibratedWhite:0.988 alpha:1.0] 
+		dividerShader = [[LinearDividerShader alloc] initWithStartColor:[NSColor colorWithCalibratedWhite:0.988 alpha:1.0]
 															   endColor:[NSColor colorWithCalibratedWhite:0.875 alpha:1.0]];
+		darkDividerShader = [[LinearDividerShader alloc] initWithStartColor:[NSColor colorWithCalibratedWhite:0.20 alpha:1.0]
+																   endColor:[NSColor colorWithCalibratedWhite:0.14 alpha:1.0]];
 		
 		isCreatingANote = isFilteringFromTyping = typedStringIsCached = NO;
 		typedString = @"";
@@ -312,6 +314,10 @@ terminateApp:
 	} else {
 		URLToInterpretOnLaunch = [fullURL retain];
 	}
+}
+
+- (void)applyForegroundColorToNotes {
+	[notationController makeForegroundTextColorMatchGlobalPrefs];
 }
 
 - (void)setNotationController:(NotationController*)newNotation {
@@ -1558,7 +1564,14 @@ terminateApp:
 - (NSRect)splitView:(RBSplitView*)sender willDrawDividerInRect:(NSRect)dividerRect betweenView:(RBSplitSubview*)leading 
 			andView:(RBSplitSubview*)trailing withProposedRect:(NSRect)imageRect {
 	
-	[dividerShader drawDividerInRect:dividerRect withDimpleRect:imageRect blendVertically:![prefsController horizontalLayout]];
+	LinearDividerShader *shader = dividerShader;
+	if (@available(macOS 10.14, *)) {
+		NSAppearanceName name = [[sender effectiveAppearance] bestMatchFromAppearancesWithNames:
+								 @[NSAppearanceNameAqua, NSAppearanceNameDarkAqua]];
+		if ([name isEqualToString:NSAppearanceNameDarkAqua])
+			shader = darkDividerShader;
+	}
+	[shader drawDividerInRect:dividerRect withDimpleRect:imageRect blendVertically:![prefsController horizontalLayout]];
 	
 	return NSZeroRect;
 }
@@ -1750,7 +1763,8 @@ terminateApp:
 - (void)dealloc {
 	[windowUndoManager release];
 	[dividerShader release];
-	
+	[darkDividerShader release];
+
 	[super dealloc];
 }
 

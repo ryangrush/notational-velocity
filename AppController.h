@@ -57,6 +57,7 @@
 	
 	NSImage *verticalDividerImg;
 	LinearDividerShader *dividerShader;
+	LinearDividerShader *darkDividerShader;
 	
 	NSString *URLToInterpretOnLaunch;
 	NSMutableArray *pathsToOpenOnLaunch;
@@ -79,6 +80,7 @@
 void outletObjectAwoke(id sender);
 
 - (void)setNotationController:(NotationController*)newNotation;
+- (void)applyForegroundColorToNotes;
 - (void)handleGetURLEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent;
 
 - (void)setupViewsAfterAppAwakened;

@@ -27,6 +27,16 @@
 	return self;
 }
 
+- (void)drawRect:(NSRect)dirtyRect {
+	if (@available(macOS 11.0, *)) {
+		[[self effectiveAppearance] performAsCurrentDrawingAppearance:^{
+			[super drawRect:dirtyRect];
+		}];
+	} else {
+		[super drawRect:dirtyRect];
+	}
+}
+
 - (void)_resizeColumn:(NSInteger)resizedColIdx withEvent:(id)event {	
 	//use a more understandable column resizing by changing the resizing mask immediately before calling through to the private method,
 	//and reverting it back to the original at the next runloop iteration

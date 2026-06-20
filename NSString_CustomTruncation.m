@@ -103,7 +103,7 @@ static NSMutableParagraphStyle *LineBreakingStyle() {
 
 static NSDictionary *GrayTextAttributes() {
 	static NSDictionary *grayTextAttributes = nil;
-	if (!grayTextAttributes) grayTextAttributes = [[NSDictionary dictionaryWithObjectsAndKeys:[NSColor grayColor], NSForegroundColorAttributeName, nil] retain];
+	if (!grayTextAttributes) grayTextAttributes = [[NSDictionary dictionaryWithObjectsAndKeys:[NSColor secondaryLabelColor], NSForegroundColorAttributeName, nil] retain];
 	return grayTextAttributes;
 }
 
@@ -121,8 +121,9 @@ NSDictionary *LineTruncAttributesForTitle() {
 		BOOL usesBold = ColumnIsSet(NoteLabelsColumn, bitmap) || ColumnIsSet(NoteDateCreatedColumn, bitmap) ||
 		ColumnIsSet(NoteDateModifiedColumn, bitmap) || [prefs tableColumnsShowPreview];
 		
-		titleTruncAttrs = [[NSDictionary dictionaryWithObjectsAndKeys:[[LineBreakingStyle() mutableCopy] autorelease], NSParagraphStyleAttributeName, 
-							(usesBold ? [NSFont boldSystemFontOfSize:fontSize] : [NSFont systemFontOfSize:fontSize]), NSFontAttributeName, nil] retain];
+		titleTruncAttrs = [[NSDictionary dictionaryWithObjectsAndKeys:[[LineBreakingStyle() mutableCopy] autorelease], NSParagraphStyleAttributeName,
+							(usesBold ? [NSFont boldSystemFontOfSize:fontSize] : [NSFont systemFontOfSize:fontSize]), NSFontAttributeName,
+							[NSColor labelColor], NSForegroundColorAttributeName, nil] retain];
 		
 		if (ColumnIsSet(NoteDateCreatedColumn, bitmap) || ColumnIsSet(NoteDateModifiedColumn, bitmap)) {
 			//account for right-"aligned" date string, which will be relatively constant, so this can be cached
@@ -162,8 +163,8 @@ static size_t EstimatedCharCountForWidth(float upToWidth) {
 	//title is black (no added colors) and truncated with LineTruncAttributesForTitle()
 	//body is gray and truncated with a variable tail indent, depending on intruding tags
 	
-	NSDictionary *bodyTruncDict = [NSDictionary dictionaryWithObjectsAndKeys:[[LineBreakingStyle() mutableCopy] autorelease], 
-								   NSParagraphStyleAttributeName, [NSColor grayColor], NSForegroundColorAttributeName, nil];
+	NSDictionary *bodyTruncDict = [NSDictionary dictionaryWithObjectsAndKeys:[[LineBreakingStyle() mutableCopy] autorelease],
+								   NSParagraphStyleAttributeName, [NSColor secondaryLabelColor], NSForegroundColorAttributeName, nil];
 	//set word-wrapping to let -[NSCell setTruncatesLastVisibleLine:] work
 	[[bodyTruncDict objectForKey:NSParagraphStyleAttributeName] setLineBreakMode:NSLineBreakByWordWrapping];
 	
@@ -206,6 +207,7 @@ static size_t EstimatedCharCountForWidth(float upToWidth) {
 	[unattributedPreview appendString:truncatedBodyString];
 	
 	NSMutableAttributedString *attributedStringPreview = [[NSMutableAttributedString alloc] initWithString:unattributedPreview attributes:LineTruncAttributes()];
+	[attributedStringPreview addAttribute:NSForegroundColorAttributeName value:[NSColor labelColor] range:NSMakeRange(0, [self length])];
 	[attributedStringPreview addAttributes:GrayTextAttributes() range:NSMakeRange([self length], [unattributedPreview length] - [self length])];
 	
 	[unattributedPreview release];

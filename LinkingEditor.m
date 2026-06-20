@@ -196,11 +196,18 @@ CGFloat _perceptualDarkness(NSColor*a);
 - (void)updateTextColors {
 	NSColor *fgColor = [prefsController foregroundTextColor];
 	NSColor *bgColor = [prefsController backgroundTextColor];
-	
+
+	[self setBackgroundColor:bgColor];
 	[self setInsertionPointColor:[self _insertionPointColorForForegroundColor:fgColor backgroundColor:bgColor]];
 	[self setLinkTextAttributes:[self preferredLinkAttributes]];
-	[self setSelectedTextAttributes:[NSDictionary dictionaryWithObject:[self _selectionColorForForegroundColor:fgColor backgroundColor:bgColor] 
+	[self setSelectedTextAttributes:[NSDictionary dictionaryWithObject:[self _selectionColorForForegroundColor:fgColor backgroundColor:bgColor]
 																forKey:NSBackgroundColorAttributeName]];
+}
+
+- (void)viewDidChangeEffectiveAppearance {
+	[super viewDidChangeEffectiveAppearance];
+	[self updateTextColors];
+	[[NSApp delegate] performSelector:@selector(applyForegroundColorToNotes)];
 }
 
 #define _CM(__ch) ((__ch) * 255.0)
